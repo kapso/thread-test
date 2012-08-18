@@ -1,0 +1,4 @@
+# Thread test
+
+  $ rails s OR bundle exec unicorn -p 3000 -c ./config/unicorn.rb
+  $ ab -n 20 -c 10 http://localhost:3000/home?threads=4
