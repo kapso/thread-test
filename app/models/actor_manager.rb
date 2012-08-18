@@ -16,7 +16,7 @@ class ActorManager
   end
 
   def submit_actor(actor, method, *params)
-    raise 'Not a valid actor instance' if actor.blank? || !actor.is_a?(Celluloid)
+    raise 'Not a valid actor object' if actor.blank? || !actor.is_a?(Celluloid)
 
     @futures << actor.future(method.to_sym, *params)
     @actors << actor
