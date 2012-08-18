@@ -1,6 +1,6 @@
 class ActorManager
   def initialize(actor = nil)
-    raise 'Not a valid actor instance' if actor.present? && !actor.is_a?(Celluloid)    
+    raise 'Not a valid actor object' if actor.present? && !actor.is_a?(Celluloid)    
     @init_actor = actor
     @futures = []
     @actors = []
@@ -9,6 +9,8 @@ class ActorManager
   end
 
   def submit(method, *params)
+    raise 'Not initialized with a valid actor object' if @init_actor.blank?
+
     @futures << @init_actor.future(method.to_sym, *params)
     @actors << @init_actor
   end
