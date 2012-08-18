@@ -2,7 +2,7 @@ class HomeController < ApplicationController
   def index
     threads = params[:threads] || 3
     puts "\nUsing threads: #{threads.to_i}"
-    render_json data: Car.test_drive(threads.to_i).to_json
+    render json: Car.test_drive(threads.to_i)
   end
 
   def show
