@@ -1,11 +1,13 @@
 class ActorManager
   def initialize(actor = nil)
-    raise 'Not a valid actor object' if actor.present? && !actor.is_a?(Celluloid)    
+    raise 'Not a valid actor object' if actor.present? && !actor.is_a?(Celluloid)
+
     @init_actor = actor
     @futures = []
     @actors = []
     @response = []
     @next_response_ctr = 0
+    @auto_terminate = true
   end
 
   def submit(method, *params)
@@ -38,9 +40,9 @@ class ActorManager
   end
 
   def next_response
-    if @futures.blank?
-      raise 'No actors/requests submitted, cannot process response'
-    elsif @next_response_ctr >= @futures.size
+    logger.warn '[ActorManager] No actors/requests submitted' if @futures.blank?
+
+    if @next_response_ctr >= @futures.size
       nil
     else
       value = process_request(@next_response_ctr)
@@ -53,12 +55,18 @@ class ActorManager
   def terminate!
     actor_arr = @actors.uniq
 
-    actor_arr.each do |actor|
-      begin
-        actor.terminate if actor.alive?
-      rescue => e
-        logger.warn "Error: terminating actor #{actor.inspect}: #{e.message}"
+    if actor_arr.present?
+      actor_arr.each do |actor|
+        begin
+          actor.terminate if actor.alive?
+        rescue => e
+          logger.warn "[ActorManager] Error: terminating actor #{actor.inspect}: #{e.message}"
+        end
       end
+
+      @actors.clear
+      @futures.clear
+      @next_response_ctr = 0
     end
   end
 
@@ -83,6 +91,14 @@ class ActorManager
     response.include? nil
   end
 
+  def set_auto_terminate(auto = true)
+    @auto_terminate = auto
+  end
+
+  def auto_terminate?
+    @auto_terminate
+  end
+
   private
   def logger
     Rails.logger
@@ -90,7 +106,9 @@ class ActorManager
 
   def process_request(index)
     if @actors[index].alive?
-      @futures[index].value
+      value = @futures[index].value
+      terminate! if auto_terminate? && index == (@futures.size - 1)
+      value
     else
       raise "Actor is dead possibly due to some earlier exception, cannot process response: #{@actors[index].inspect}"
     end

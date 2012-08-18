@@ -50,10 +50,8 @@
     #   resp << r
     # end
 
-    puts "\nTasks complete: #{am.tasks_complete?}"
-
-    # Required to terminate actors & GC
-    am.terminate!
+    # Terminate actors & GC. Required if set_auto_terminate(false)
+    # am.terminate!
 
     resp
   end
