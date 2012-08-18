@@ -7,7 +7,6 @@ class ActorManager
     @actors = []
     @response = []
     @next_response_ctr = 0
-    @auto_terminate = true
   end
 
   def submit(method, *params)
@@ -40,9 +39,9 @@ class ActorManager
   end
 
   def next_response
-    logger.warn '[ActorManager] No actors/requests submitted' if @futures.blank?
-
-    if @next_response_ctr >= @futures.size
+    if @futures.blank?
+      raise 'No actors/requests submitted, cannot process response'
+    elsif @next_response_ctr >= @futures.size
       nil
     else
       value = process_request(@next_response_ctr)
@@ -91,14 +90,6 @@ class ActorManager
     response.include? nil
   end
 
-  def set_auto_terminate(auto = true)
-    @auto_terminate = auto
-  end
-
-  def auto_terminate?
-    @auto_terminate
-  end
-
   private
   def logger
     Rails.logger
@@ -106,9 +97,7 @@ class ActorManager
 
   def process_request(index)
     if @actors[index].alive?
-      value = @futures[index].value
-      terminate! if auto_terminate? && index == (@futures.size - 1)
-      value
+      @futures[index].value
     else
       raise "Actor is dead possibly due to some earlier exception, cannot process response: #{@actors[index].inspect}"
     end
