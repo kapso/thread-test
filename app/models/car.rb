@@ -7,7 +7,6 @@
   end
 
   def drive(speed = 80)
-    # sleep 17
     sleep [0.8, 1.5, 2].sample
     raise "what the hell happened here" if speed == 100
     { name: @name, current_speed: speed, start_speed: @start_speed }
