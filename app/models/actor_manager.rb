@@ -27,7 +27,7 @@ class ActorManager
       @response
     else
       (@next_response_ctr..(@futures.size - 1)).each do |index|
-        @response << process_actor(index)
+        @response << process_request(index)
         @next_response_ctr += 1
       end
 
