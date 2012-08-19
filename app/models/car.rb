@@ -32,7 +32,7 @@
     # thread_count.times { am.submit_actor(Car.new(rand(20)), :drive, rand(90)) }
 
     puts "\n#{thread_count} cars sent for test drive..."
-    puts "\nTasks complete: #{am.tasks_complete?}"
+    puts "\nTasks running: #{am.tasks_running?}"
 
     # Blocking call: get all actor's response in a array. Response array order is the same as the "submit" order 
     # resp = am.response
@@ -49,7 +49,7 @@
     #   resp << r
     # end
 
-    puts "\nTasks complete: #{am.tasks_complete?}"
+    puts "\nTasks running: #{am.tasks_running?}"
 
     # Terminate actors for GC. Required.
     am.terminate!

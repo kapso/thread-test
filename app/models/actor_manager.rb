@@ -69,15 +69,16 @@ class ActorManager
     end
   end
 
-  def tasks_complete?
+  def tasks_running?
     actor_arr = @actors.uniq
-    raise 'No actors/requests submitted' if actor_arr.blank?
+    
+    return false if actor_arr.blank?
 
     actor_arr.each do |actor|
-      actor.tasks.each { |task| return false if task.running? }
+      actor.tasks.each { |task| return true if task.running? }
     end
 
-    true
+    false
   end
 
   def each_response
