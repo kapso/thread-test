@@ -70,11 +70,7 @@ class ActorManager
   end
 
   def tasks_running?
-    actor_arr = @actors.uniq
-    
-    return false if actor_arr.blank?
-
-    actor_arr.each do |actor|
+    @actors.uniq.each do |actor|
       actor.tasks.each { |task| return true if task.running? }
     end
 
